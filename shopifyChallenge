@@ -1,0 +1,73 @@
+Question 1: Given some sample data, write a program to answer the following:
+
+On Shopify, we have exactly 100 sneaker shops, and each of these shops sells only one model of shoe. We want to do some 
+analysis of the average order value (AOV). When we look at orders data over a 30 day window, we naively calculate an AOV of $3145.13. 
+Given that we know these shops are selling sneakers, a relatively affordable item, something seems wrong with our analysis. 
+
+a.	Think about what could be going wrong with our calculation. Think about a better way to evaluate this data. 
+First, we have to check the data. Since the AOV is very high, it means that there might be some values in order_amount and total_items that are increasing substantially the AOV.
+I noticed that there are 18 orders for $704000, from the same person, same time, different days, and several more that have extremely high values. 
+By sorting from Largest to Smallest Value, I noticed that there are  63 orders that have an extremely high price, greater than 25000$.
+Meanwhile, the rest of the orders (4937 in total) have an order amount of less than $1800. This values are clearly outliers. 
+The AOV would be significantly less if we delete the outliers.
+
+
+b.	What metric would you report for this dataset?
+I would clean the data by deleting the rows with the outliers and work with the remaining values. 
+It's easy to do it manually since there are not too many values; however, for longer arrays, I would create a VBA Subroutine in Excel that will immediately delete
+any row that has an outlier value. There are 63 outliers in the database, representing only 1.26% of our data, which is not a relevant amount.
+
+c.	What is its value?
+After cleaning the data, we will use the formula:
+AOV = SUM(order_amount)/COUNT(number_of_orders)
+With the outliers, the AOV was $3145.13. 
+Without the outliers, the AOV is $302.58, a fair and more reasonable amount.
+
+Question 2: For this question you’ll need to use SQL. Follow this link to access the data set required for the challenge. 
+Please use queries to answer the following questions. Paste your queries along with your final numerical answers below.
+
+a.	How many orders were shipped by Speedy Express in total?
+
+Input: 
+SELECT COUNT(*) FROM Orders WHERE ShipperID = 1
+
+Output = 54
+Since I know that the ShipperID for Speedy Express is 1, I wrote the code in this way, which is more efficient and fast.
+
+b.	What is the last name of the employee with the most orders?
+
+Input: 
+SELECT LastName FROM Employees
+  WHERE EmployeeID IN
+    (SELECT EmployeeID
+     FROM Orders  GROUP BY EmployeeID
+     HAVING COUNT (EmployeeID)= ( 
+        SELECT MAX(maximum)
+        FROM(SELECT COUNT(EmployeeID) maximum FROM Orders
+        GROUP BY EmployeeID)));
+
+Output: Peacock
+This part was a bit more complicated than Question a, but the logic is simple. It's important to always start the first SELECT with the information we want, and proceed from there.
+
+c.	What product was ordered the most by customers in Germany?
+
+Input:
+
+SELECT ProductName FROM Products
+    WHERE ProductID IN
+    (SELECT ProductID FROM OrderDetails  
+        WHERE Quantity = (SELECT MAX(Quantity) FROM OrderDetails WHERE OrderID IN
+        (SELECT OrderID FROM Orders
+            WHERE CustomerID IN
+            (Select CustomerID FROM Customers
+                WHERE Country = 'Germany'))));
+
+Output: Steeleye Stout
+
+I spent a fair amount of time in this problem. Since I had to query information from different tables, I had to see which column names were the same in each table, that way
+I was going to be able to connect the information; however, I struggled a bit in the part where I had to choose the maximum quantity, because I was putting that part of 
+the code at the very bottom, and I'd get the maximum amount but in general, not only from Germany.
+I also got confused when putting the parenthesis, but I managed to fix it.
+Still, this was a funny challenge that I was able to complete, demonstrating my data science skills.
+
+
