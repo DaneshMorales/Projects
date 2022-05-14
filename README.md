@@ -1,2 +1,2 @@
-# dataquest
-Dataquest personal projects
+# Personal Projects
+
